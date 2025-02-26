@@ -9,5 +9,5 @@ export declare class User extends CommonEntity {
     password: string;
     profilePicture: string;
     roles: Role[];
-    memberTypes: MemberType;
+    memberTypes: MemberType[];
 }

@@ -35,5 +35,5 @@ export class User extends CommonEntity {
   roles: Role[];
 
   @ManyToMany(() => MemberType, (memberType) => memberType.users)
-  memberTypes: MemberType;
+  memberTypes: MemberType[];
 }

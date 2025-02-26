@@ -16,7 +16,7 @@ const user_entity_1 = require("../../user/entities/user.entity");
 const typeorm_1 = require("typeorm");
 let MemberType = class MemberType extends common_entity_1.CommonEntity {
     static _OPENAPI_METADATA_FACTORY() {
-        return { memberType: { required: true, type: () => String }, users: { required: true, type: () => require("../../user/entities/user.entity").User } };
+        return { memberType: { required: true, type: () => String }, users: { required: true, type: () => [require("../../user/entities/user.entity").User] } };
     }
 };
 exports.MemberType = MemberType;
@@ -31,7 +31,7 @@ __decorate([
         joinColumn: { name: 'member_type_id', referencedColumnName: 'id' },
         inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
     }),
-    __metadata("design:type", user_entity_1.User)
+    __metadata("design:type", Array)
 ], MemberType.prototype, "users", void 0);
 exports.MemberType = MemberType = __decorate([
     (0, typeorm_1.Entity)()

@@ -5,15 +5,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { safeError } from 'src/helper/safe-error.helper';
+import { runInTransaction } from 'src/helper/transaction.helper';
+import { Permission } from 'src/permission/entities/permission.entity';
+import { In, Repository, UpdateResult } from 'typeorm';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { In, Repository, UpdateResult } from 'typeorm';
-import { safeError } from 'src/helper/safe-error.helper';
-import { Permission } from 'src/permission/entities/permission.entity';
-import { runInTransaction } from 'src/helper/transaction.helper';
-import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class RoleService {
@@ -38,7 +37,10 @@ export class RoleService {
           where: { name: In(createRoleDto.permissions) },
         }),
       );
-      if (assignedPermissions.length === 0) {
+      if (
+        assignedPermissions.length === 0 ||
+        assignedPermissions.length !== createRoleDto.permissions.length
+      ) {
         throw new BadRequestException('Invalid permissions');
       }
       if (err) {
@@ -100,7 +102,10 @@ export class RoleService {
           where: { name: In(updateRoleDto.permissions) },
         }),
       );
-      if (assignedPermissions.length === 0) {
+      if (
+        assignedPermissions.length === 0 ||
+        assignedPermissions.length !== updateRoleDto.permissions.length
+      ) {
         throw new BadRequestException('Invalid permissions');
       }
       if (err) {

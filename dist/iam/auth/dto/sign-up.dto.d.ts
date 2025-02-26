@@ -7,4 +7,5 @@ export declare class SignUpDto {
     confirmPassword: string;
     profilePicture?: any;
     roles?: string[];
+    memberTypes?: string[];
 }

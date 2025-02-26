@@ -17,7 +17,7 @@ const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
 class SignUpDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { firstName: { required: true, type: () => String, minLength: 2, maxLength: 20 }, lastName: { required: true, type: () => String, minLength: 2, maxLength: 20 }, phoneNumber: { required: true, type: () => String, pattern: "/^\\+977-9\\d{9}$/" }, email: { required: true, type: () => String, format: "email" }, password: { required: true, type: () => String, minLength: 8 }, confirmPassword: { required: true, type: () => String }, profilePicture: { required: false, type: () => Object }, roles: { required: false, type: () => [String] } };
+        return { firstName: { required: true, type: () => String, minLength: 2, maxLength: 20 }, lastName: { required: true, type: () => String, minLength: 2, maxLength: 20 }, phoneNumber: { required: true, type: () => String, pattern: "/^\\+977-9\\d{9}$/" }, email: { required: true, type: () => String, format: "email" }, password: { required: true, type: () => String, minLength: 8 }, confirmPassword: { required: true, type: () => String }, profilePicture: { required: false, type: () => Object }, roles: { required: false, type: () => [String] }, memberTypes: { required: false, type: () => [String] } };
     }
 }
 exports.SignUpDto = SignUpDto;
@@ -81,4 +81,21 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], SignUpDto.prototype, "roles", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)({ message: 'Member types must be an array of strings' }),
+    (0, class_validator_1.IsString)({ each: true, message: 'Each member type must be a string' }),
+    (0, class_transformer_1.Transform)(({ value }) => {
+        if (typeof value === 'string') {
+            try {
+                return JSON.parse(value);
+            }
+            catch (e) {
+                return value.split(',').map((role) => role.trim());
+            }
+        }
+        return value;
+    }),
+    __metadata("design:type", Array)
+], SignUpDto.prototype, "memberTypes", void 0);
 //# sourceMappingURL=sign-up.dto.js.map

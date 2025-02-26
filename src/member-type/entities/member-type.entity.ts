@@ -13,5 +13,5 @@ export class MemberType extends CommonEntity {
     joinColumn: { name: 'member_type_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
-  users: User;
+  users: User[];
 }

@@ -63,4 +63,19 @@ export class SignUpDto {
     return value;
   })
   roles?: string[];
+
+  @IsOptional()
+  @IsArray({ message: 'Member types must be an array of strings' })
+  @IsString({ each: true, message: 'Each member type must be a string' })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value.split(',').map((role) => role.trim());
+      }
+    }
+    return value;
+  })
+  memberTypes?: string[];
 }

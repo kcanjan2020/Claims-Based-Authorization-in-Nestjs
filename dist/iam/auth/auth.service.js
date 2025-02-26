@@ -32,14 +32,16 @@ const get_deleted_clause_1 = require("../../helper/get-deleted-clause");
 const transaction_helper_1 = require("../../helper/transaction.helper");
 const user_entity_1 = require("../../user/entities/user.entity");
 const role_entity_1 = require("../../role/entities/role.entity");
+const member_type_entity_1 = require("../../member-type/entities/member-type.entity");
 let AuthService = class AuthService {
-    constructor(userRepository, hashingService, jwtService, jwtConfiguration, storageService, roleRepository) {
+    constructor(userRepository, hashingService, jwtService, jwtConfiguration, storageService, roleRepository, memberTypeRepository) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.jwtService = jwtService;
         this.jwtConfiguration = jwtConfiguration;
         this.storageService = storageService;
         this.roleRepository = roleRepository;
+        this.memberTypeRepository = memberTypeRepository;
     }
     async generateTokens(user) {
         const token = (0, crypto_1.randomUUID)();
@@ -82,6 +84,19 @@ let AuthService = class AuthService {
                 throw new common_1.InternalServerErrorException('Error while fetching roles');
             }
             _user.roles = assignedRoles;
+        }
+        if (signUpDto.memberTypes) {
+            const [memberTypes, err] = await (0, safe_error_helper_1.safeError)(this.memberTypeRepository.find({
+                where: { memberType: (0, typeorm_2.In)(signUpDto.memberTypes) },
+            }));
+            if (memberTypes.length === 0 ||
+                memberTypes.length !== signUpDto.memberTypes.length) {
+                throw new common_1.BadRequestException('Invalid Member Type');
+            }
+            if (err) {
+                throw new common_1.InternalServerErrorException('Error while fetching member types');
+            }
+            _user.memberTypes = memberTypes;
         }
         if (profilePicture) {
             const [fileName, err] = await (0, safe_error_helper_1.safeError)(this.storageService.save('profile-picture', profilePicture));
@@ -196,6 +211,25 @@ let AuthService = class AuthService {
             }
             user.roles = assignedRoles;
         }
+        if (userUpdateDto.memberTypes) {
+            const [memberTypes, err] = await (0, safe_error_helper_1.safeError)(this.memberTypeRepository.find({
+                where: { memberType: (0, typeorm_2.In)(userUpdateDto.memberTypes) },
+            }));
+            if (memberTypes.length === 0 ||
+                memberTypes.length !== userUpdateDto.memberTypes.length) {
+                throw new common_1.BadRequestException('Invalid Member Type');
+            }
+            if (err) {
+                throw new common_1.InternalServerErrorException('Error while fetching member types');
+            }
+            user.memberTypes = memberTypes;
+        }
+        if (profilePicture) {
+            const [fileName, err] = await (0, safe_error_helper_1.safeError)(this.storageService.save('profile-picture', profilePicture));
+            if (err)
+                throw new common_1.InternalServerErrorException('Failed to save profile picture');
+            user.profilePicture = fileName;
+        }
         try {
             userUpdateDto.firstName
                 ? (user.firstName = userUpdateDto.firstName)
@@ -274,9 +308,11 @@ exports.AuthService = AuthService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __param(3, (0, common_1.Inject)(jwt_config_1.default.KEY)),
     __param(5, (0, typeorm_1.InjectRepository)(role_entity_1.Role)),
+    __param(6, (0, typeorm_1.InjectRepository)(member_type_entity_1.MemberType)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         hashing_service_1.HashingService,
         jwt_1.JwtService, void 0, storage_service_1.StorageService,
+        typeorm_2.Repository,
         typeorm_2.Repository])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

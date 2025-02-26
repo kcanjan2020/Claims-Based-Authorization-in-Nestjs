@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoleService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const role_entity_1 = require("./entities/role.entity");
-const typeorm_2 = require("typeorm");
 const safe_error_helper_1 = require("../helper/safe-error.helper");
-const permission_entity_1 = require("../permission/entities/permission.entity");
 const transaction_helper_1 = require("../helper/transaction.helper");
+const permission_entity_1 = require("../permission/entities/permission.entity");
+const typeorm_2 = require("typeorm");
+const role_entity_1 = require("./entities/role.entity");
 let RoleService = class RoleService {
     constructor(roleRepository, permissionRepository) {
         this.roleRepository = roleRepository;
@@ -35,7 +35,8 @@ let RoleService = class RoleService {
             const [assignedPermissions, err] = await (0, safe_error_helper_1.safeError)(this.permissionRepository.find({
                 where: { name: (0, typeorm_2.In)(createRoleDto.permissions) },
             }));
-            if (assignedPermissions.length === 0) {
+            if (assignedPermissions.length === 0 ||
+                assignedPermissions.length !== createRoleDto.permissions.length) {
                 throw new common_1.BadRequestException('Invalid permissions');
             }
             if (err) {
@@ -81,7 +82,8 @@ let RoleService = class RoleService {
             const [assignedPermissions, err] = await (0, safe_error_helper_1.safeError)(this.permissionRepository.find({
                 where: { name: (0, typeorm_2.In)(updateRoleDto.permissions) },
             }));
-            if (assignedPermissions.length === 0) {
+            if (assignedPermissions.length === 0 ||
+                assignedPermissions.length !== updateRoleDto.permissions.length) {
                 throw new common_1.BadRequestException('Invalid permissions');
             }
             if (err) {

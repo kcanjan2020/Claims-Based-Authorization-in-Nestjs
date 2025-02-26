@@ -36,6 +36,7 @@ import { runInTransaction } from 'src/helper/transaction.helper';
 import { User } from 'src/user/entities/user.entity';
 import { Role } from 'src/role/entities/role.entity';
 import { RoleService } from 'src/role/role.service';
+import { MemberType } from 'src/member-type/entities/member-type.entity';
 
 @Injectable()
 export class AuthService {
@@ -49,6 +50,8 @@ export class AuthService {
     private readonly storageService: StorageService,
 
     @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
+    @InjectRepository(MemberType)
+    private readonly memberTypeRepository: Repository<MemberType>,
   ) {}
 
   private async generateTokens(user: User) {
@@ -115,6 +118,26 @@ export class AuthService {
       }
       _user.roles = assignedRoles;
     }
+    if (signUpDto.memberTypes) {
+      const [memberTypes, err] = await safeError(
+        this.memberTypeRepository.find({
+          where: { memberType: In(signUpDto.memberTypes) },
+        }),
+      );
+      if (
+        memberTypes.length === 0 ||
+        memberTypes.length !== signUpDto.memberTypes.length
+      ) {
+        throw new BadRequestException('Invalid Member Type');
+      }
+      if (err) {
+        throw new InternalServerErrorException(
+          'Error while fetching member types',
+        );
+      }
+      _user.memberTypes = memberTypes;
+    }
+
     if (profilePicture) {
       const [fileName, err] = await safeError(
         this.storageService.save('profile-picture', profilePicture),
@@ -268,6 +291,37 @@ export class AuthService {
         throw new InternalServerErrorException('Error while fetching roles');
       }
       user.roles = assignedRoles;
+    }
+
+    if (userUpdateDto.memberTypes) {
+      const [memberTypes, err] = await safeError(
+        this.memberTypeRepository.find({
+          where: { memberType: In(userUpdateDto.memberTypes) },
+        }),
+      );
+      if (
+        memberTypes.length === 0 ||
+        memberTypes.length !== userUpdateDto.memberTypes.length
+      ) {
+        throw new BadRequestException('Invalid Member Type');
+      }
+      if (err) {
+        throw new InternalServerErrorException(
+          'Error while fetching member types',
+        );
+      }
+      user.memberTypes = memberTypes;
+    }
+
+    if (profilePicture) {
+      const [fileName, err] = await safeError(
+        this.storageService.save('profile-picture', profilePicture),
+      );
+      if (err)
+        throw new InternalServerErrorException(
+          'Failed to save profile picture',
+        );
+      user.profilePicture = fileName;
     }
 
     try {

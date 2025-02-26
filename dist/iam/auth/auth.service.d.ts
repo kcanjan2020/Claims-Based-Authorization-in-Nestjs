@@ -14,6 +14,7 @@ import { BaseQuery } from 'src/dto/baseQuery.dto';
 import { PaginatedDto } from 'src/dto/pageReturn';
 import { User } from 'src/user/entities/user.entity';
 import { Role } from 'src/role/entities/role.entity';
+import { MemberType } from 'src/member-type/entities/member-type.entity';
 export declare class AuthService {
     private readonly userRepository;
     private readonly hashingService;
@@ -21,7 +22,8 @@ export declare class AuthService {
     private readonly jwtConfiguration;
     private readonly storageService;
     private readonly roleRepository;
-    constructor(userRepository: Repository<User>, hashingService: HashingService, jwtService: JwtService, jwtConfiguration: ConfigType<typeof jwtConfig>, storageService: StorageService, roleRepository: Repository<Role>);
+    private readonly memberTypeRepository;
+    constructor(userRepository: Repository<User>, hashingService: HashingService, jwtService: JwtService, jwtConfiguration: ConfigType<typeof jwtConfig>, storageService: StorageService, roleRepository: Repository<Role>, memberTypeRepository: Repository<MemberType>);
     private generateTokens;
     private signToken;
     signup(signUpDto: SignUpDto, profilePicture: Express.Multer.File): Promise<User>;

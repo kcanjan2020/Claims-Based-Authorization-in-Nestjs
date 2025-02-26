@@ -23,13 +23,14 @@ const jwt_config_1 = require("./config/jwt.config");
 const bcrypt_service_1 = require("./hashing/bcrypt.service");
 const hashing_service_1 = require("./hashing/hashing.service");
 const role_entity_1 = require("../role/entities/role.entity");
+const member_type_entity_1 = require("../member-type/entities/member-type.entity");
 let IamModule = class IamModule {
 };
 exports.IamModule = IamModule;
 exports.IamModule = IamModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, role_entity_1.Role]),
+            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, role_entity_1.Role, member_type_entity_1.MemberType]),
             jwt_1.JwtModule.registerAsync(jwt_config_1.default.asProvider()),
             config_1.ConfigModule.forFeature(jwt_config_1.default),
         ],
