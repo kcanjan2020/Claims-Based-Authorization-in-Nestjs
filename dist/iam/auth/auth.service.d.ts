@@ -1,0 +1,40 @@
+import { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { StorageService } from 'src/helper/storage.service';
+import { Repository } from 'typeorm';
+import jwtConfig from '../config/jwt.config';
+import { HashingService } from '../hashing/hashing.service';
+import { ActiveUserData } from '../interface/active-user-data.interface';
+import { RefreshTokenDto, TokenResponseDto } from './dto/refresh-token.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
+import { UpdatePasswordDto, UpdatePasswordResponseDto } from './dto/update-password.dto';
+import { UserUpdateDto } from './dto/user-update.dto';
+import { BaseQuery } from 'src/dto/baseQuery.dto';
+import { PaginatedDto } from 'src/dto/pageReturn';
+import { User } from 'src/user/entities/user.entity';
+import { Role } from 'src/role/entities/role.entity';
+export declare class AuthService {
+    private readonly userRepository;
+    private readonly hashingService;
+    private readonly jwtService;
+    private readonly jwtConfiguration;
+    private readonly storageService;
+    private readonly roleRepository;
+    constructor(userRepository: Repository<User>, hashingService: HashingService, jwtService: JwtService, jwtConfiguration: ConfigType<typeof jwtConfig>, storageService: StorageService, roleRepository: Repository<Role>);
+    private generateTokens;
+    private signToken;
+    signup(signUpDto: SignUpDto, profilePicture: Express.Multer.File): Promise<User>;
+    signin(signInDto: SignInDto): Promise<TokenResponseDto>;
+    refreshToken(refreshTokenDto: RefreshTokenDto): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }>;
+    getMe(loggedIn: ActiveUserData): Promise<User>;
+    updatePassword(loggedInUser: ActiveUserData, updatePasswordDto: UpdatePasswordDto): Promise<UpdatePasswordResponseDto>;
+    update(userUpdateDto: UserUpdateDto, userId: number, profilePicture: Express.Multer.File): Promise<User>;
+    getAllUser(queries: BaseQuery): Promise<PaginatedDto<User>>;
+    findOne(id: number): Promise<User>;
+    remove(id: number): Promise<import("typeorm").UpdateResult>;
+    getUserPermission(userId: number): Promise<void>;
+}
