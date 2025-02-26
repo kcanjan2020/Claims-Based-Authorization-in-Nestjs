@@ -1,8 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { MemberTypeService } from './member-type.service';
 import { CreateMemberTypeDto } from './dto/create-member-type.dto';
 import { UpdateMemberTypeDto } from './dto/update-member-type.dto';
+import { Auth } from 'src/iam/auth/decorator/auth.decorator';
+import { AuthType } from 'src/iam/auth/enums/auth-type.enum';
 
+@Auth(AuthType.None)
 @Controller('member-type')
 export class MemberTypeController {
   constructor(private readonly memberTypeService: MemberTypeService) {}
@@ -23,7 +34,10 @@ export class MemberTypeController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMemberTypeDto: UpdateMemberTypeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateMemberTypeDto: UpdateMemberTypeDto,
+  ) {
     return this.memberTypeService.update(+id, updateMemberTypeDto);
   }
 

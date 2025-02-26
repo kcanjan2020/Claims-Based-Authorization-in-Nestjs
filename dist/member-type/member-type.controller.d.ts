@@ -4,9 +4,9 @@ import { UpdateMemberTypeDto } from './dto/update-member-type.dto';
 export declare class MemberTypeController {
     private readonly memberTypeService;
     constructor(memberTypeService: MemberTypeService);
-    create(createMemberTypeDto: CreateMemberTypeDto): string;
-    findAll(): string;
-    findOne(id: string): string;
-    update(id: string, updateMemberTypeDto: UpdateMemberTypeDto): string;
-    remove(id: string): string;
+    create(createMemberTypeDto: CreateMemberTypeDto): Promise<import("./entities/member-type.entity").MemberType>;
+    findAll(): Promise<import("./entities/member-type.entity").MemberType[]>;
+    findOne(id: string): Promise<import("./entities/member-type.entity").MemberType>;
+    update(id: string, updateMemberTypeDto: UpdateMemberTypeDto): Promise<import("./entities/member-type.entity").MemberType>;
+    remove(id: string): Promise<string>;
 }

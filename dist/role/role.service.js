@@ -26,6 +26,10 @@ let RoleService = class RoleService {
         this.permissionRepository = permissionRepository;
     }
     async create(createRoleDto) {
+        const [roleExists] = await (0, safe_error_helper_1.safeError)(this.roleRepository.exists({ where: { name: createRoleDto.name } }));
+        if (roleExists) {
+            throw new common_1.ConflictException(`Role ${createRoleDto.name} already exists`);
+        }
         const newRole = new role_entity_1.Role();
         if (createRoleDto.permissions) {
             const [assignedPermissions, err] = await (0, safe_error_helper_1.safeError)(this.permissionRepository.find({
@@ -40,16 +44,7 @@ let RoleService = class RoleService {
             newRole.permissions = assignedPermissions;
         }
         newRole.name = createRoleDto.name;
-        try {
-            const role = await this.roleRepository.save(newRole);
-            return role;
-        }
-        catch (error) {
-            if (error.code === '23505') {
-                throw new common_1.BadRequestException(` ${createRoleDto.name} Role already exists`);
-            }
-            throw new common_1.InternalServerErrorException('Error while creating role');
-        }
+        return (0, transaction_helper_1.runInTransaction)(async (queryRunner) => queryRunner.manager.save(role_entity_1.Role, newRole));
     }
     async findAll() {
         const [roles, error] = await (0, safe_error_helper_1.safeError)(this.roleRepository.find());
@@ -78,7 +73,7 @@ let RoleService = class RoleService {
                 where: { name: updateRoleDto.name },
             });
             if (existingRole) {
-                throw new common_1.BadRequestException(`Role ${updateRoleDto.name} already exists`);
+                throw new common_1.ConflictException(`Role ${updateRoleDto.name} already exists`);
             }
             role.name = updateRoleDto.name;
         }
@@ -98,11 +93,7 @@ let RoleService = class RoleService {
     }
     async remove(id) {
         const role = await this.findOne(id);
-        const [res, error] = await (0, safe_error_helper_1.safeError)(this.roleRepository.remove(role));
-        if (error) {
-            console.log('fsdfsa', error);
-            throw new common_1.InternalServerErrorException('Error while deleting role');
-        }
+        (0, transaction_helper_1.runInTransaction)(async (queryRunner) => queryRunner.manager.softRemove(role_entity_1.Role, role));
         return `${role.name} Role deleted successfully`;
     }
 };

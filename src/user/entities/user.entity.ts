@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { CommonEntity } from 'src/entities/common.entity';
+import { MemberType } from 'src/member-type/entities/member-type.entity';
 import { Role } from 'src/role/entities/role.entity';
 import { Column, Entity, Index, JoinTable, ManyToMany } from 'typeorm';
 
@@ -32,4 +33,7 @@ export class User extends CommonEntity {
     inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
   })
   roles: Role[];
+
+  @ManyToMany(() => MemberType, (memberType) => memberType.users)
+  memberTypes: MemberType;
 }

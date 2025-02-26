@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -12,6 +13,7 @@ import { In, Repository, UpdateResult } from 'typeorm';
 import { safeError } from 'src/helper/safe-error.helper';
 import { Permission } from 'src/permission/entities/permission.entity';
 import { runInTransaction } from 'src/helper/transaction.helper';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class RoleService {
@@ -22,8 +24,14 @@ export class RoleService {
   ) {}
 
   async create(createRoleDto: CreateRoleDto): Promise<Role> {
-    const newRole = new Role();
+    const [roleExists] = await safeError(
+      this.roleRepository.exists({ where: { name: createRoleDto.name } }),
+    );
+    if (roleExists) {
+      throw new ConflictException(`Role ${createRoleDto.name} already exists`);
+    }
 
+    const newRole = new Role();
     if (createRoleDto.permissions) {
       const [assignedPermissions, err] = await safeError(
         this.permissionRepository.find({
@@ -41,17 +49,10 @@ export class RoleService {
       newRole.permissions = assignedPermissions;
     }
     newRole.name = createRoleDto.name;
-    try {
-      const role = await this.roleRepository.save(newRole);
-      return role;
-    } catch (error) {
-      if (error.code === '23505') {
-        throw new BadRequestException(
-          ` ${createRoleDto.name} Role already exists`,
-        );
-      }
-      throw new InternalServerErrorException('Error while creating role');
-    }
+
+    return runInTransaction(async (queryRunner) =>
+      queryRunner.manager.save(Role, newRole),
+    );
   }
   async findAll(): Promise<Role[]> {
     const [roles, error] = await safeError(this.roleRepository.find());
@@ -87,7 +88,7 @@ export class RoleService {
         where: { name: updateRoleDto.name },
       });
       if (existingRole) {
-        throw new BadRequestException(
+        throw new ConflictException(
           `Role ${updateRoleDto.name} already exists`,
         );
       }
@@ -117,12 +118,10 @@ export class RoleService {
 
   async remove(id: number): Promise<string> {
     const role = await this.findOne(id);
-    const [res, error] = await safeError(this.roleRepository.remove(role));
-    if (error) {
-      console.log('fsdfsa', error);
 
-      throw new InternalServerErrorException('Error while deleting role');
-    }
+    runInTransaction(async (queryRunner) =>
+      queryRunner.manager.softRemove(Role, role),
+    );
     return `${role.name} Role deleted successfully`;
   }
 }

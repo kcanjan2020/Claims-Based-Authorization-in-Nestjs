@@ -18,6 +18,8 @@ const common_1 = require("@nestjs/common");
 const member_type_service_1 = require("./member-type.service");
 const create_member_type_dto_1 = require("./dto/create-member-type.dto");
 const update_member_type_dto_1 = require("./dto/update-member-type.dto");
+const auth_decorator_1 = require("../iam/auth/decorator/auth.decorator");
+const auth_type_enum_1 = require("../iam/auth/enums/auth-type.enum");
 let MemberTypeController = class MemberTypeController {
     constructor(memberTypeService) {
         this.memberTypeService = memberTypeService;
@@ -41,7 +43,7 @@ let MemberTypeController = class MemberTypeController {
 exports.MemberTypeController = MemberTypeController;
 __decorate([
     (0, common_1.Post)(),
-    openapi.ApiResponse({ status: 201, type: String }),
+    openapi.ApiResponse({ status: 201, type: require("./entities/member-type.entity").MemberType }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_member_type_dto_1.CreateMemberTypeDto]),
@@ -49,14 +51,14 @@ __decorate([
 ], MemberTypeController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    openapi.ApiResponse({ status: 200, type: String }),
+    openapi.ApiResponse({ status: 200, type: [require("./entities/member-type.entity").MemberType] }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], MemberTypeController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    openapi.ApiResponse({ status: 200, type: String }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/member-type.entity").MemberType }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -64,7 +66,7 @@ __decorate([
 ], MemberTypeController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    openapi.ApiResponse({ status: 200, type: String }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/member-type.entity").MemberType }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -80,6 +82,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MemberTypeController.prototype, "remove", null);
 exports.MemberTypeController = MemberTypeController = __decorate([
+    (0, auth_decorator_1.Auth)(auth_type_enum_1.AuthType.None),
     (0, common_1.Controller)('member-type'),
     __metadata("design:paramtypes", [member_type_service_1.MemberTypeService])
 ], MemberTypeController);

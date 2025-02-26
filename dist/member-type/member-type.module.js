@@ -10,11 +10,14 @@ exports.MemberTypeModule = void 0;
 const common_1 = require("@nestjs/common");
 const member_type_service_1 = require("./member-type.service");
 const member_type_controller_1 = require("./member-type.controller");
+const typeorm_1 = require("@nestjs/typeorm");
+const member_type_entity_1 = require("./entities/member-type.entity");
 let MemberTypeModule = class MemberTypeModule {
 };
 exports.MemberTypeModule = MemberTypeModule;
 exports.MemberTypeModule = MemberTypeModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([member_type_entity_1.MemberType])],
         controllers: [member_type_controller_1.MemberTypeController],
         providers: [member_type_service_1.MemberTypeService],
     })

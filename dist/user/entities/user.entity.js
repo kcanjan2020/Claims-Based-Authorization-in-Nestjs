@@ -13,11 +13,12 @@ exports.User = void 0;
 const openapi = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const common_entity_1 = require("../../entities/common.entity");
+const member_type_entity_1 = require("../../member-type/entities/member-type.entity");
 const role_entity_1 = require("../../role/entities/role.entity");
 const typeorm_1 = require("typeorm");
 let User = class User extends common_entity_1.CommonEntity {
     static _OPENAPI_METADATA_FACTORY() {
-        return { firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: true, type: () => String }, email: { required: true, type: () => String }, password: { required: true, type: () => String }, profilePicture: { required: true, type: () => String }, roles: { required: true, type: () => [require("../../role/entities/role.entity").Role] } };
+        return { firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: true, type: () => String }, email: { required: true, type: () => String }, password: { required: true, type: () => String }, profilePicture: { required: true, type: () => String }, roles: { required: true, type: () => [require("../../role/entities/role.entity").Role] }, memberTypes: { required: true, type: () => require("../../member-type/entities/member-type.entity").MemberType } };
     }
 };
 exports.User = User;
@@ -56,6 +57,10 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], User.prototype, "roles", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => member_type_entity_1.MemberType, (memberType) => memberType.users),
+    __metadata("design:type", member_type_entity_1.MemberType)
+], User.prototype, "memberTypes", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('user')
 ], User);
